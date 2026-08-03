@@ -17,3 +17,6 @@ sudo docker image prune
 
 sudo docker image rmi <image_id>
 ```
+
+## ex01
+Create a Dockerfile, build and run it, create a second version, build and run it. notice how some layers are cached!
