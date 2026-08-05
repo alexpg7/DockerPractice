@@ -61,4 +61,14 @@ sudo docker run --mount type=volume,src=my-volume,dst=/data -it ex03
 ls /data
 exit
 ```
+## ex05 Docker compose
 
+A new way to build images, it's like a makefile
+
+```bash
+sudo docker compose up
+sudo docker compose down
+
+# to run terminal
+sudo docker compose run app bash
+```
