@@ -61,9 +61,16 @@ sudo docker run --mount type=volume,src=my-volume,dst=/data -it ex03
 ls /data
 exit
 ```
-## ex05 Docker compose
+## ex04 Docker compose
 
-A new way to build images, it's like a makefile
+A new way to build images, it's like a makefile. You specify the name of the app (``app``), where to get the resources (``build``) and the name of the container (``container_name``)
+
+```yaml
+services:
+  app:
+    build: .
+    container_name: ex04
+```
 
 ```bash
 sudo docker compose up
@@ -71,4 +78,73 @@ sudo docker compose down
 
 # to run terminal
 sudo docker compose run app bash
+```
+
+## ex05 Multiple apps
+
+Build multimple images from one docker-compose
+
+```bash
+sudo docker compose up
+
+# check how are Images created
+sudo docker images
+sudo docker ps -a
+
+# remove all images
+sudo docker image prune -a
+```
+
+## ex06 Container networking
+
+Learn how to access other containers built in the same docker compose
+
+```bash
+# detached compose (since now containers are infinitely running)
+sudo docker compose up -d
+
+# enter one of the apps
+sudo docker exec -it app1 bash
+
+# inside app1, get the app2 adress
+getent hosts app2
+
+# stop running containers and images
+# optional
+sudo docker compose stop
+sudo docker compose down
+sudo docker image prune -a
+```
+
+## ex07 Opening ports
+
+Comunicate with the containers through external sources.
+
+First, add the ports in the docker-compose file:
+
+```yaml
+    ports:
+      - "8080:80"
+```
+
+This reads: host port 8080 -> container port 80
+
+This time, the dockerfile will listen to the port with a simple python3 library:
+
+```Dockerfile
+FROM debian:12
+
+RUN apt update && apt install -y python3
+
+COPY index.html /index.html
+
+CMD ["python3", "-m", "http.server", "80", "--directory", "/"]
+```
+
+```bash
+# detached compose
+sudo docker compose up -d
+
+# make a http request through your port
+curl localhost:8080
 ```
