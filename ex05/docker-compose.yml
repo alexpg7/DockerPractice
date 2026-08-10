@@ -1,0 +1,7 @@
+services:
+  app1:
+    build: ./app1/
+    container_name: app1
+  app2:
+    build: ./app2/
+    container_name: app2
