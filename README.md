@@ -148,3 +148,37 @@ sudo docker compose up -d
 # make a http request through your port
 curl localhost:8080
 ```
+
+## ex08 Compose + Volume
+
+To add volumes to our compose, we add this section to our compose file (inside services):
+
+```yaml
+    volumes:
+      - my-volume:/data
+```
+
+And add a new volume section below services:
+
+```yaml
+volumes:
+  my-volume:
+```
+
+```bash
+# detached compose
+sudo docker compose up -d
+
+# enter the container and create data in the volume
+sudo docker exec -it app bash
+echo "data" > /data/data.txt
+exit
+
+# take the container down and compose+run it again
+sudo docker compose down
+sudo docker compose up -d
+sudo docker exec -it app bash
+
+# check inside /data
+cat /data/data.txt
+```
