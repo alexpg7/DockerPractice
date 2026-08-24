@@ -1,0 +1,9 @@
+services:
+  app:
+    build: .
+    container_name: app
+    volumes:
+      - my-volume:/data
+
+volumes:
+  my-volume:
