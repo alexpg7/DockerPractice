@@ -208,3 +208,24 @@ APP_NAME=my-docker-app
 APP_VERSION=1.0
 ...
 ```
+
+## ex10 Environment with ``.env``
+
+This time, we will put our variables inside a ``.env`` file. For example:
+
+```bash
+NAME=student
+PROJECT=inception
+LEVEL=beginner
+```
+
+And write the variables substitution inside the compose file:
+
+```yaml
+    environment:
+      NAME: ${NAME}
+      PROJECT: ${PROJECT}
+      LEVEL: ${LEVEL}
+```
+
+Every time you build the container from the image, it will take your custom environment.
