@@ -1,0 +1,8 @@
+services:
+  app:
+    build: .
+    container_name: app
+    environment:
+      APP_NAME: "my-docker-app"
+      APP_VERSION: "1.0"
+      MESSAGE: "Hello from Compose"

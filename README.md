@@ -182,3 +182,29 @@ sudo docker exec -it app bash
 # check inside /data
 cat /data/data.txt
 ```
+
+## ex09 Environment variables
+
+Add this item in your compose file:
+
+```yaml
+    environment:
+      APP_NAME: "my-docker-app"
+      APP_VERSION: "1.0"
+      MESSAGE: "Hello from Compose"
+```
+
+This compose creates environment variables inside the system of the container. It can be checked by entering inside and reading the ``env`` variables:
+
+```bash
+sudo docker exec -it app bash
+env
+```
+
+```output
+...
+MESSAGE=Hello from Compose
+APP_NAME=my-docker-app
+APP_VERSION=1.0
+...
+```
