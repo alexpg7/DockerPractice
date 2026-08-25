@@ -229,3 +229,50 @@ And write the variables substitution inside the compose file:
 ```
 
 Every time you build the container from the image, it will take your custom environment.
+
+## ex11 A small multi-service application
+
+Now, we will build different apps together, gathering all we learned. The ``docker-compose.yml`` should include all these items:
+
+```yaml
+services:
+
+  app:
+    build: ./app
+    container_name: ${APP_NAME}
+    ports:
+      - "${APP_PORT}:80"
+    environment:
+      DB_HOST: db
+      DB_PORT: ${DB_PORT}
+
+  db:
+    build: ./db
+    container_name: ${DB_NAME}
+    volumes:
+      - db-data:/data
+
+volumes:
+  db-data:
+```
+
+There is nothing new, but we are using all the new things we learned. Using the ``curl`` command in the port we defined in ``.env`` for ``app``, we can get the ``index.html`` content.
+
+```bash
+curl localhost:8080
+```
+
+Now, we can enter the ``app`` container and try to connect to ``db`` by its name.
+
+```bash
+sudo docker exec -it inception-app bash
+getent hosts db
+```
+
+Inside ``app``, we can connect to ``db`` by using the ``curl`` command also:
+
+```bash
+curl http://db:8000
+```
+
+since our ``db`` server is hosting ``/data`` (our volume), ``python`` automatically created a directory listing from an empty folder.
