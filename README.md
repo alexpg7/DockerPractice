@@ -275,7 +275,7 @@ Inside ``app``, we can connect to ``db`` by using the ``curl`` command also:
 curl http://db:8000
 ```
 
-since our ``db`` server is hosting ``/data`` (our volume), ``python`` automatically created a directory listing from an empty folder.
+Since our ``db`` server is hosting ``/data`` (our volume), ``python`` automatically created a directory listing from an empty folder.
 
 So, we succeeded working out our little network, which has the following structure:
 
@@ -295,4 +295,94 @@ So, we succeeded working out our little network, which has the following structu
         localhost:8080
 ```
 
-## ex12
+## ex12 A real database: MariaDB
+
+In this case, we will build the following structure:
+
+```output
+                 Docker network
+        ┌─────────────────────────────┐
+        │                             │
+        │  client/test ───► MariaDB   │
+        │                       │     │
+        │                       ▼     │
+        │                    volume   │
+        │                             │
+        └─────────────────────────────┘
+```
+
+For this case, this ``Dockerfile`` is more than enough, since ``mariadb`` already starts a server on the port we indicate.
+
+```Dockerfile
+FROM mariadb:11
+
+EXPOSE 3306
+```
+
+The ``docker-compose.yml`` will be really similar to the previous one, except we only have 1 service. In this case, the ``ports`` section will not be specified, since mariadb will not need to be accessed from our machine, but from other container.
+
+Once we compose everything, let's check the *ready for connections* message:
+
+```bash
+sudo docker compose logs mariadb
+```
+
+```output
+ex12-mariadb  | 2026-08-26 14:26:34 0 [Note] mariadbd: ready for connections.
+```
+
+Now, we can enter inside and try to log into the database. We will use the credentials specified in ``.env``. Since we named them with the standard names ``MYSQL_USER``, ``MYSQL_PASSWORD``, ``mariadb`` has them inside already:
+
+```bash
+docker exec -it ex12-mariadb bash
+mariadb -u student -p
+studentpass
+```
+
+Inside the database, we could do some queries:
+
+```SQL
+SHOW DATABASES;
+```
+
+```output
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| school             |
++--------------------+
+```
+
+And create a simple table:
+
+```SQL
+USE school;
+CREATE TABLE students (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100)
+);
+
+INSERT INTO students (name) VALUES ('Alice');
+
+INSERT INTO students (name) VALUES ('Bob');
+
+INSERT INTO students (name) VALUES ('Charlie');
+
+SELECT * FROM students;
+
+EXIT;
+```
+
+Now, exit the container,  ``compose down``, and compose up again; check the database we created:
+
+```bash
+exit
+sudo docker compose down
+sudo docker compose up -d
+docker exec -it ex12-mariadb bash
+mariadb -u student -p school
+studentpass
+SELECT * FROM students;
+```
+
