@@ -390,3 +390,64 @@ The output is no suprise: the table we created is still there, since it was insi
 
 ## ex13 Two containers: Application → MariaDB
 
+This time, we'll use two services:
+
+```output
+┌──────────────────────────────────────────┐
+│              Docker network              │
+│                                          │
+│   ┌─────────────┐       ┌────────────┐   │
+│   │   client    │──────►│  mariadb   │   │
+│   │             │       │            │   │
+│   │ test script │       │ :3306      │   │
+│   └─────────────┘       └─────┬──────┘   │
+│                               │          │
+│                               ▼          │
+│                         mariadb-data     │
+└──────────────────────────────────────────┘
+```
+
+For the ``mariadb`` service, we'll use the same ``Dockerfile``. For the ``client``, we'll come back to the clients we were using in previous exercises (``debian``). This time, we'll install the ``mariadb-client`` service inside our ``debian`` container. For the compose, just add this line inside ``services``:
+
+```yaml
+  client:
+    build: ./client
+    container_name: ex13-client
+```
+
+Run and start everything, enter the client and connect to ``mariadb``
+
+```bash
+sudo docker compose up -d
+sudo docker exec -it ex13-client bash
+getent hosts mariadb
+```
+
+Connect to the database:
+
+```bash
+mariadb -h mariadb -u wpuser -p
+wppass
+```
+
+In this case, ``-h mariadb`` means "connect to the host named *mariadb*", aka the name of the service containing the database.
+
+Now, we'll do a little experiment: creating a database and trying to access it with the ``mariadb`` container stopped.
+
+```SQL
+SHOW DATABASES;
+
+USE inception;
+
+CREATE TABLE messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    message VARCHAR(255)
+);
+
+INSERT INTO messages (message)
+VALUES ('Hello from the client container!');
+
+SELECT * FROM messages;
+
+EXIT;
+```

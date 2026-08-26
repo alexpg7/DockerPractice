@@ -1,0 +1,19 @@
+services:
+
+  mariadb:
+    build: ./mariadb
+    container_name: ex13-mariadb
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+
+  client:
+    build: ./client
+    container_name: ex13-client
+
+volumes:
+  mariadb-data:
