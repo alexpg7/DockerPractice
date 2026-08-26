@@ -276,3 +276,23 @@ curl http://db:8000
 ```
 
 since our ``db`` server is hosting ``/data`` (our volume), ``python`` automatically created a directory listing from an empty folder.
+
+So, we succeeded working out our little network, which has the following structure:
+
+```output
+            Docker network
+        ┌──────────────────────┐
+        │                      │
+        │   app ───────────► db│
+        │    │                 │
+        │    │                 │
+        │    ▼                 │
+        │  :8080               │
+        └────┼─────────────────┘
+            │
+            ▼
+          HOST
+        localhost:8080
+```
+
+## ex12
