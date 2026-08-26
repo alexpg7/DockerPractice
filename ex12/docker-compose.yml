@@ -1,8 +1,7 @@
 services:
-
   mariadb:
     build: ./mariadb
-    container_name: ex12-mariadb
+    container_name: ex13-mariadb
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}

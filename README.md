@@ -311,7 +311,7 @@ In this case, we will build the following structure:
         └─────────────────────────────┘
 ```
 
-For this case, this ``Dockerfile`` is more than enough, since ``mariadb`` already starts a server on the port we indicate.
+For this case, this ``Dockerfile`` is more than enough..
 
 ```Dockerfile
 FROM mariadb:11
@@ -385,4 +385,8 @@ mariadb -u student -p school
 studentpass
 SELECT * FROM students;
 ```
+
+The output is no suprise: the table we created is still there, since it was inside the volume.
+
+## ex13 Two containers: Application → MariaDB
 
