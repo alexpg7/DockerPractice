@@ -451,3 +451,54 @@ SELECT * FROM messages;
 
 EXIT;
 ```
+
+Exit the container and stop ``mariadb``. Connect again through ``client``:
+
+```bash
+exit
+sudo docker compose stop mariadb
+sudo docker exec -it ex13-client bash
+mariadb -h mariadb -u wpuser -p
+wppass
+```
+
+It turns out that the command gets stuck forever. Restart the container and try again:
+
+```bash
+sudo docker compose start mariadb
+sudo docker exec -it ex13-client bash
+mariadb -h mariadb -u wpuser -p
+wppass
+```
+
+```SQL
+USE inception;
+SELECT * FROM messages;
+```
+
+```output
++----+----------------------------------+
+| id | message                          |
++----+----------------------------------+
+|  1 | Hello from the client container! |
++----+----------------------------------+
+```
+
+We managed to connect to the ``mariadb`` database without actually accessing the container!
+
+```output
+                 Docker network
+                       │
+             ┌─────────┴─────────┐
+             │                   │
+         client              mariadb
+             │                   │
+             │ TCP :3306         │
+             └──────────────────►│
+                                 │
+                                 ▼
+                          Docker volume
+                                 │
+                                 ▼
+                            database data
+```
