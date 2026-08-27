@@ -554,3 +554,4 @@ local     ex14_mariadb-data
 ```
 
 There you go. Try again logging in from ``http://localhost:8080``, is your post still there? It should ;D
+## ex15  PHP-FPM: separating PHP from the web server
