@@ -432,6 +432,13 @@ wppass
 
 In this case, ``-h mariadb`` means "connect to the host named *mariadb*", aka the name of the service containing the database.
 
+> [!TIP]
+> Remember, ``mariadb`` is just a shortcut to its ip and default port (``3306``). It is equivalent to executing:
+> ```bash
+> mariadb -h 172.18.0.3 -P 3306 -u wpuser -p
+> ```
+> Assuming 172.18.0.3 is the ip adress that appears when executing ``getent hosts mariadb``
+
 Now, we'll do a little experiment: creating a database and trying to access it with the ``mariadb`` container stopped.
 
 ```SQL
@@ -502,3 +509,4 @@ We managed to connect to the ``mariadb`` database without actually accessing the
                                  ▼
                             database data
 ```
+
