@@ -432,7 +432,7 @@ wppass
 
 In this case, ``-h mariadb`` means "connect to the host named *mariadb*", aka the name of the service containing the database.
 
-> [!TIP]
+> [!NOTE]
 > Remember, ``mariadb`` is just a shortcut to its ip and default port (``3306``). It is equivalent to executing:
 > ```bash
 > mariadb -h 172.18.0.3 -P 3306 -u wpuser -p
@@ -510,3 +510,47 @@ We managed to connect to the ``mariadb`` database without actually accessing the
                             database data
 ```
 
+## ex14 WordPress meets MariaDB
+
+Now, we'll do the same thing but instead of a ``debian`` client container, we'll use the WordPress one. The ``Dockerfile`` for WordPress:
+
+```Dockerfile
+FROM wordpress:php8.2-apache
+```
+
+The WordPress service in the compose file should include some new things:
+
+```yaml
+  wordpress:
+    build: ./wordpress
+    container_name: ex14-wordpress
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "8080:80"
+```
+
+And this line is really important:
+
+```yaml
+WORDPRESS_DB_HOST: mariadb:3306
+```
+
+It tells the wordpress service where to connect to find the database associated. This ``8080:80`` assignation means that when we use our local port ``8080``, it will send it to port ``80`` of the wordpress container, which is the default port that Apache uses.
+
+Once we compose the containers, we go to our browser and enter the webpage ``http://localhost:8080``. There, we can configure wordpress with any credentials we want (use fake ones to test). Try publishing some posts if you want. Now, compose down and check for the volume:
+
+```bash
+sudo docker compose down
+sudo docker volume ls
+```
+
+```output
+DRIVER    VOLUME NAME
+local     ex14_mariadb-data
+```
+
+There you go. Try again logging in from ``http://localhost:8080``, is your post still there? It should ;D
