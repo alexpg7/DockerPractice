@@ -601,3 +601,79 @@ And verify port ``9000``:
 ```bash
 grep -n "listen =" /etc/php/8.2/fpm/pool.d/www.conf
 ```
+
+## ex16 Nginx connecting to PHP-FPM
+
+This exercise aims to actually use a server to connect with PHP. We'll use the same ``Dockerfile`` for PHP, for Nginx we'll use this one:
+
+```Dockerfile
+FROM debian:12
+
+RUN apt-get update \
+    && apt-get install -y nginx \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY default.conf /etc/nginx/sites-available/default
+
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+This line ``CMD ["nginx", "-g", "daemon off;"]`` has the same goal as the previous exercise: keep the container alive.
+
+The configuration of the server is the next one:
+
+```conf
+server {
+    listen 80;
+
+    root /var/www/html;
+    index index.php;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass php:9000;
+    }
+}
+```
+
+The important line is ``fastcgi_pass php:9000;``, which tells Nginx to send PHP requests to the php service on port 9000.
+
+Another important thing is ``root /var/www/html; index index.php;``.
+
+Nginx looks for the website files in ``/var/www/html`` and uses ``index.php`` as the default file.
+
+Notice how ``/var/www/html/index.php`` is inside the PHP container. Then, we have to somehow connect both container storage; we need to mount a volume on both.
+
+```yaml
+services:
+
+  php:
+    build: ./php
+    container_name: ex16-php
+    volumes:
+      - wordpress-files:/var/www/html
+
+  nginx:
+    build: ./nginx
+    container_name: ex16-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - wordpress-files:/var/www/html
+
+volumes:
+  wordpress-files:
+```
+
+Once we execute the compose, we can try the connection through port ``8080``:
+
+```bash
+curl http://localhost:8080
+```
+```output
+Hello from PHP-FPM!
+```

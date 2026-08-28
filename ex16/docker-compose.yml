@@ -1,0 +1,18 @@
+services:
+
+  php:
+    build: ./php
+    container_name: ex16-php
+    volumes:
+      - wordpress-files:/var/www/html
+
+  nginx:
+    build: ./nginx
+    container_name: ex16-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - wordpress-files:/var/www/html
+
+volumes:
+  wordpress-files:
