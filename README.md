@@ -554,4 +554,50 @@ local     ex14_mariadb-data
 ```
 
 There you go. Try again logging in from ``http://localhost:8080``, is your post still there? It should ;D
-## ex15  PHP-FPM: separating PHP from the web server
+## ex15 PHP-FPM without Apache
+
+It is important to understand how the PHP-FPM container will work, since it's the one used in Inception. This time, no docker compose, only a ``.php`` file containing:
+
+```php
+echo "Hello from PHP-FPM!";
+```
+
+And a simple ``Dockerfile``:
+
+```Dockerfile
+FROM debian:12
+
+RUN apt-get update \
+    && apt-get install -y php8.2-fpm \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN sed -i 's#^listen = .*#listen = 9000#' /etc/php/8.2/fpm/pool.d/www.conf
+
+COPY index.php /var/www/html/index.php
+
+CMD ["php-fpm8.2", "-F"]
+```
+
+What does ``CMD ["php-fpm8.2", "-F"]`` mean? **Execute ``php-fpm8.2`` and stay in the foreground (``-F``). This way, you ensure your container keeps alive. The other line, ``RUN sed -i 's#^listen = .*#listen = 9000#' /etc/php/8.2/fpm/pool.d/www.conf`` is used to modify PHP-FPM's configuration so that it listens for connections on TCP port ``9000`` instead of its default Unix socket.
+
+Now, build the image and run a container, check the process status:
+
+```bash
+sudo docker build -t ex15-php ./php
+sudo docker run -d --name ex15-php ex15-php
+sudo docker ps
+```
+
+Now, we can check the process from inside:
+
+```bash
+sudo docker exec -it ex15-php bash
+ps aux
+php-fpm8.2 -t
+```
+
+And verify port ``9000``:
+
+```bash
+grep -n "listen =" /etc/php/8.2/fpm/pool.d/www.conf
+```
