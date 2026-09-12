@@ -677,3 +677,59 @@ curl http://localhost:8080
 ```output
 Hello from PHP-FPM!
 ```
+
+## ex17 WordPress + PHP-FPM + Nginx + MariaDB
+
+This time, we'll do an architecture really close to Inception. The ``Dockerfiles`` for ``mariadb`` and ``wordpress`` are just:
+
+```Dockerfile
+FROM mariadb:11
+```
+```Dockerfile
+FROM wordpress:php8.2-fpm
+```
+
+The ``nginx`` one will have the same as in the previous exercise, as well as use the same configuration except for connecting the ``wordpress`` service to port ``9000`` instead of ``php``.
+
+The ``docker-compose.yml`` gets much more trickier:
+
+```yaml
+services:
+
+  mariadb:
+    build: ./mariadb
+    container_name: ex17-mariadb
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+
+  wordpress:
+    build: ./wordpress
+    container_name: ex17-wordpress
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - wordpress-files:/var/www/html
+
+  nginx:
+    build: ./nginx
+    container_name: ex17-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - wordpress-files:/var/www/html
+
+volumes:
+  mariadb-data:
+  wordpress-files:
+```
+
+It might seem too complicated, but it's just the combination of ``ex16`` and ``ex14``. Try running everything, open ``localhost:8080`` in your favourite browser (please, don't be Chrome) and install your Wordpress site. Try publishing anything, decompose (don't destroy the volumes), compose again and check your post is still there.
+

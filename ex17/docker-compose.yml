@@ -1,0 +1,35 @@
+services:
+
+  mariadb:
+    build: ./mariadb
+    container_name: ex17-mariadb
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+
+  wordpress:
+    build: ./wordpress
+    container_name: ex17-wordpress
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - wordpress-files:/var/www/html
+
+  nginx:
+    build: ./nginx
+    container_name: ex17-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - wordpress-files:/var/www/html
+
+volumes:
+  mariadb-data:
+  wordpress-files:
